@@ -1,4 +1,4 @@
-# geostat
+# geostat 1.0.0
 'geostat' aims to analyze on-farm research data. 'geostat' is developed using Matlab 2019b. The effects of treatment (e.g. fertilizer application) or environental variables (soil properties) on crop yield or quality can be evaluated using a spatial linear mixed model. Yield monitor or remotely senesed data are assumed to used as a response variable. 
 
 # How to use
@@ -15,4 +15,4 @@ Two dimentions are need (e.g. direction of tractors' travel (x) and perpendicula
 *To avoid the local minimum problem in minimizing negative log-likelihood, initial parameter sets will be randomly chosen and fitted for Nrun times by Global Optimization Toolbox.
 
 # Code sharing policy
-The code could be used without limitations for any purposes. However, if a publication, conference paper, book, poster, or any other publications as an outcome of such a work, reference is required. In case a help is needed in using the code, or adapting the code to a specific dataset, please do not hesitate to contact me. Takashi Tanaka, XX/04/2020
+The code could be used without limitations for any purposes. However, if a publication, conference paper, book, poster, or any other publications as an outcome of such a work, reference is required. In case a help is needed in using the code, or adapting the code to a specific dataset, please do not hesitate to contact me. Takashi Tanaka, 11/04/2020
