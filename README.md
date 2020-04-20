@@ -5,20 +5,20 @@
 * Optimization Toolbox
 * Global Optimization Toolbox
 
-Environments under [Matlab 2020a] is tested.
+Environments under Matlab 2020a are tested.
 
 ## How to use
-Please run section code in 'demo.m' to learn how to use following functions. Three dataset are availble for this demo.
+Please run section code in 'demo.m' to learn how to use following functions. Three dataset ('Field1–3.csv') are availble for this demo.
 
-* 'likfit' fits the isotropic model.<br>
+* '__likfit__' fits the isotropic model.<br>
 Exponential or Matern covariance functions are available. Three values [nugget sill rho] will be optimized for the exponential covariance function. Initial values (x0), the number of random runs (Nrun*), lower and upper bounds for values (lower, upper) should be specified. Two estimators (ML and REML) are available. REML will be used if a value for REML is 1. This function is basically originated from R package 'geoR'.
 
-* 'variog' evaluates omni-directional experimental variograms.
+* '__variog__' evaluates omni-directional experimental variograms.
 
-* 'likfit2' fits the anisotropic model (sum-metric model).<br>
+* '__likfit2__' fits the anisotropic model (sum-metric model).<br>
 Two dimentions are needed (e.g. direction of tractors' travel (x) and perpendicular to travel (y)) for the parameter estimations. Sum-metric model has been widely used for space-time modelling in the previous literatures, and it is developed for anisotropic modelling.  Exponential or Matern covariance functions are available currently. Eight values [nugget sill1 sill2 sill3 rho1 rho2 rho3 alpha] should be optimized for the exponential convariance function. Initial values (x0), the number of random runs (Nrun*), lower and upper bounds for values (lower, upper) should be specified. Two estimators (ML and REML) are available. REML will be used if a vale for REML is 1.
 
-* 'variog2' evaluates 2 directional experimental variograms.
+* '__variog2__' evaluates two directional experimental variograms.
 
 *To avoid the local minimum problem in minimizing negative log-likelihood, initial parameter sets will be randomly chosen and fitted for Nrun times by Global Optimization Toolbox.
 
