@@ -8,7 +8,7 @@
 Environments under Matlab 2020a are tested.
 
 ## How to use
-Please run section code in 'demo.m' to learn how to use following functions. Three dataset ('Field1–3.csv') are availble for this demo.
+Please run each section code in 'demo.m' to learn how to use following functions. Three dataset ('Field1–3.csv') are availble for this demo.
 
 * '__likfit__' fits the isotropic model.<br>
 Exponential or Matern covariance functions are available. Three values [nugget sill rho] will be optimized for the exponential covariance function. Initial values (x0), the number of random runs (Nrun*), lower and upper bounds for values (lower, upper) should be specified. Two estimators (ML and REML) are available. REML will be used if a value for REML is 1. This function is basically originated from R package 'geoR'.
