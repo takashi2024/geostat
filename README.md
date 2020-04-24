@@ -4,6 +4,7 @@
 ## Requirement
 * Optimization Toolbox
 * Global Optimization Toolbox
+* Parallel Computing Toolbox (optional)
 
 Environments under Matlab 2020a are tested.
 
