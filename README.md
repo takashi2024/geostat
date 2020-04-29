@@ -33,4 +33,4 @@ The code is available without limitations for any purposes. However, if a public
 * Researchgate: https://www.researchgate.net/profile/Takashi_Tanaka8
 
 ## Notice
-The manuscript which uses this source code is in preparation. As soon as the staus of manuscript is updated, detailed information will be provided.
+The manuscript which uses this source code is in preparation. Preprint version is available from https://arxiv.org/abs/2004.12741.
