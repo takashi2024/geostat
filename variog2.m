@@ -1,4 +1,4 @@
-% variog2 returns 2-dementional residual variogram.
+% variog2 returns 2-dimensional residual variogram.
 %
 % model derives from likfit2 function.
 %
