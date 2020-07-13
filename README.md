@@ -17,7 +17,7 @@ Exponential or Matern covariance functions are available. Three values [nugget s
 * '__variog__' evaluates omni-directional experimental variograms.
 
 * '__likfit2__' fits the anisotropic model (sum-metric model).<br>
-Two dimentions are needed (e.g. direction of tractors' travel (x) and perpendicular to travel (y)) for the parameter estimations. Sum-metric model has been widely used for space-time modelling in the previous literatures, and it is developed for anisotropic modelling.  Exponential or Matern covariance functions are available currently. Eight values [nugget sill1 sill2 sill3 rho1 rho2 rho3 alpha] should be optimized for the exponential convariance function. Initial values (x0), the number of random runs (Nrun*), lower and upper bounds for values (lower, upper) should be specified. Two estimators (ML and REML) are available. REML will be used if a vale for REML is 1.
+Two dimensions are needed (e.g. direction of tractors' travel (x) and perpendicular to travel (y)) for the parameter estimations. Sum-metric model has been widely used for space-time modelling in the previous literatures, and it is developed for anisotropic modelling.  Exponential or Matern covariance functions are available currently. Eight values [nugget sill1 sill2 sill3 rho1 rho2 rho3 alpha] should be optimized for the exponential convariance function. Initial values (x0), the number of random runs (Nrun*), lower and upper bounds for values (lower, upper) should be specified. Two estimators (ML and REML) are available. REML will be used if a vale for REML is 1.
 
 * '__variog2__' evaluates two directional experimental variograms.
 
