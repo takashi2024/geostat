@@ -1,13 +1,13 @@
 %% Data import 
 % Three dataset (Field1–3) are available for this demo. 
-data = readtable('Field1.csv');
-% data = readtable('Field2.csv');
-% data = readtable('Field3.csv');
+ data = readtable('Input/Data_for_2.5m_mesh/Field1.csv');
+% data = readtable('Input/Data_for_2.5m_mesh/Field2.csv');
+% data = readtable('Input/Data_for_2.5m_mesh/Field3.csv');
 
 %% Data preparation
 
 % Fixed design matrix (Independent variables)
-X = horzcat(repelem(1,length(data.Yield))', data.D1); % The 1st column is for intecept. The 2nd column is for D1–4. 
+X = horzcat(repelem(1,length(data.Yield))', data.D5); % The 1st column is for intecept. The 2nd column is for D1–4. 
 
 % Response variable
 Y = data.Yield; 
@@ -53,18 +53,18 @@ result_ols = fitlm(X(:,2:end), Y);
 %% Fit isotropic model
 rng default % For reproducibility
 x0 = [0.5 0.5 10]; % Initial values for parameters (nugget, sill, and rho).
-Nrun = 10; % Iterations for optimazation
+Nrun = 20; % Iterations for optimazation
 lower = [1e-9 1e-9 1e-9]; % Lower bound list for the parameters
-upper = [1 1 50*max(max(dist))];% Upper bound list for the parameters
+upper = [1 4 (max(max(dist)))/2];% Upper bound list for the parameters
 [model_1] = likfit(x0,dist,X,Y,1,'exp', Nrun,lower,upper); % Fit model
 
 %% Fit Anisotropic model
 rng default % For reproducibility
 x0 = [0.5 0.5 0.5 0.5 1 1 1 1]; % Initial values for parameters (nugget, sill1, sill2, sill3, rho1, rho2, rho3, and alpha)
-Nrun = 10; % Iterations for optimazation
+Nrun = 30; % Iterations for optimazation
 lower = [1e-9 1e-9 1e-9 1e-9 1e-9 1e-9 1e-9 1e-9]; % Lower bound list for the parameters 
-upper = [2 2 2 2 50*max(max([dist1 dist2])) 50*max(max([dist1 dist2]))...
-    50*max(max([dist1 dist2])) 1e2];  % Upper bound list for the parameters 
+upper = [1 4 4 4 (max(max(dist1))/2) (max(max(dist2))/2)...
+    (max(max([dist1 dist2]))/2) 1e2];  % Upper bound list for the parameters 
 [model_2] = likfit2(x0,dist1,dist2,X,Y,1,'exp',Nrun,lower,upper); % Fit model
 
 %% Summary: All results (OLS, isotropic and anisotropic models) are shown.
@@ -111,7 +111,7 @@ xlabel('Lag (m)')
 ylabel('Semi-variance (t ha^{-1})^{2}')
 
 %% Plot (residual) experimental and fitted variogram (2 dimentional)
-[dist1_type,dist2_type,variance_2] = variog2(model_2,dist1,dist2,X,Y,30,2);
+[dist1_type,dist2_type,variance_2] = variog2(model_2,dist1,dist2,X,Y,100,1);
 
 % Plot experimental variogram
 figure;
@@ -122,10 +122,10 @@ ylabel('{\it y} lag (m)')
 zlabel('Semi-variance (t ha^{-1})^{2}')
 
 % Plot fitted variogram
-dist1_type = unique(dist1);
-dist2_type = unique(dist2);
-dist1_type_list = 0:2.5:round(max(dist1_type));
-dist2_type_list = 0:2.5:round(max(dist2_type));
+dist1_type_raw = unique(dist1);
+dist2_type_raw = unique(dist2);
+dist1_type_list = 0:2.5:round(max(dist1_type_raw));
+dist2_type_list = 0:2.5:round(max(dist2_type_raw));
 
 m = length(dist1_type_list);
 n = length(dist2_type_list);
@@ -140,11 +140,12 @@ for i = 1:n
     ini = ini + m;
 end
 
-mat_variog(mat_variog==0) = NaN;
-
 xlag = mat_variog(:,1);
 ylag = mat_variog(:,2);
+
 [Xlag,Ylag] = meshgrid(xlag, ylag);
+Xlag(Xlag==max(xlag)) = NaN; % avoid to connect the initial and last points
+
 nugget = table2array(model_2.GeoVal(1,1));
 sill1 = table2array(model_2.GeoVal(1,2));
 sill2 = table2array(model_2.GeoVal(2,2));
@@ -156,12 +157,11 @@ alpha = table2array(model_2.GeoVal(3,4));
 fitVariog = nugget + sill1 + sill2 + sill3...
         - (sill1 * exp(-Xlag/rho1)...
         + sill2 * exp(-Ylag/rho2)...
-        + sill3 * exp(-sqrt(Xlag.^2 + (alpha*Ylag).^2)/rho3));
-
+        + sill3 * exp(-sqrt(Xlag.^2 + (alpha*Ylag).^2)/rho3));    
+    
 figure;
 mesh(xlag,ylag,fitVariog,'FaceLighting','gouraud','LineWidth',0.5)
 title('Fitted variogram')
 xlabel('{\it x} lag (m)')
 ylabel('{\it y} lag (m)')
 zlabel('Semi-variance (t ha^{-1})^{2}')
-
