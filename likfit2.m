@@ -1,8 +1,8 @@
-% 'likfit2' will fit the 2-dimentinal anisotropic model. It returns model
+% 'likfit2' will fit the 2-dimensional anisotropic model. It returns model
 % (the best parameters with the lowest likelihood) and solutions (optimized
 % parameter for each run).
 %
-% Currently, sum-metric model with matern and exponential kernel is available. 
+% Currently, sum-metric model with matern or exponential kernel is available. 
 
 function [model] = likfit2(x0,dist1,dist2,X,Y,REML,cov_model,Nrun,lower,upper)
     ms = MultiStart('Display','iter','FunctionTolerance',1e-6,'PlotFcn',[],...
@@ -76,9 +76,9 @@ function [model] = likfit2(x0,dist1,dist2,X,Y,REML,cov_model,Nrun,lower,upper)
         estimator = 'ML';
     end
     
-    new_sill1 = sill1 * new_sill/(sill1 + sill2 + sill3);
-    new_sill2 = sill2 * new_sill/(sill1 + sill2 + sill3);
-    new_sill3 = sill3 * new_sill/(sill1 + sill2 + sill3);
+    new_sill1 = sill1 * new_sill; %/(sill1 + sill2 + sill3);
+    new_sill2 = sill2 * new_sill; %/(sill1 + sill2 + sill3);
+    new_sill3 = sill3 * new_sill; %/(sill1 + sill2 + sill3);
     new_nugget = nugget * new_sill;
     new_C = new_sill * C;
 
@@ -88,11 +88,16 @@ function [model] = likfit2(x0,dist1,dist2,X,Y,REML,cov_model,Nrun,lower,upper)
 
     Result1 = table(beta,sqrt(diag(new_C)),z_score,p_value);
     Result1.Properties.VariableNames = {'Estimate', 'SE', 'Z score','pValue'};
+    
     requestIDs = 'X';
-    for k = 1 : (p-1)
-        requestID{k} = [requestIDs '_' num2str(k,'%d')]; % Cell Array
+    if (p==1)
+        Result1.Properties.RowNames = cellstr('(Intercept)'); % Cell Array
+    else
+        for k = 1 : (p-1)
+            requestID{k} = [requestIDs '_' num2str(k,'%d')]; % Cell Array
+        end
+        Result1.Properties.RowNames = ['(Intercept)', requestID];
     end
-    Result1.Properties.RowNames = ['(Intercept)', requestID];
     
     if strcmp(cov_model,'matern')
         Result2 = table([new_nugget NaN NaN]',[new_sill1 new_sill2 new_sill3]',[rho1 rho2 rho3]',[nu1 nu2 nu3]', [NaN NaN alpha]');
