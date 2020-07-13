@@ -62,11 +62,16 @@ function [result, solutions] = likfit(x0,dist,X,Y,REML,cov_model,Nrun,lower,uppe
 
     Result1 = table(beta,sqrt(diag(new_C)),z_score,p_value);
     Result1.Properties.VariableNames = {'Estimate', 'SE', 'Z score','pValue'};
+    
     requestIDs = 'X';
-    for k = 1 : (p-1)
-        requestID{k} = [requestIDs '_' num2str(k,'%d')]; % Cell Array
+    if (p==1)
+        Result1.Properties.RowNames = cellstr('(Intercept)'); % Cell Array
+    else
+        for k = 1 : (p-1)
+            requestID{k} = [requestIDs '_' num2str(k,'%d')]; % Cell Array
+        end
+        Result1.Properties.RowNames = ['(Intercept)', requestID];
     end
-    Result1.Properties.RowNames = ['(Intercept)', requestID];
 
     if strcmp(cov_model,'matern')
         Result2 = table(new_nugget,new_sill,rho,nu);
