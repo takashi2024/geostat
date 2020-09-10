@@ -5,7 +5,9 @@
 % The semi-variance will not be evaluated (NaN will be returned) if the
 % number of lag pairs is less than the value of minPairs.
 
-function [dist1_type, dist2_type, variance] = variog2(model,dist1,dist2,X,Y,minPairs,precision)
+function [dist1_type, dist2_type, variance] = variog2(model,coords,X,Y,minPairs,precision)
+    dist1 = squareform(pdist(coords(:,1)));
+    dist2 = squareform(pdist(coords(:,2)));
     dist1 = round(dist1,precision);
     dist2 = round(dist2,precision);
     beta = table2array(model.Coefficients(:,1));
