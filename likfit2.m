@@ -4,7 +4,10 @@
 %
 % Currently, sum-metric model with matern or exponential kernel is available. 
 
-function [model] = likfit2(x0,dist1,dist2,X,Y,REML,cov_model,Nrun,lower,upper)
+function [model] = likfit2(x0,coords,X,Y,REML,cov_model,Nrun,lower,upper)
+    dist1 = squareform(pdist(coords(:,1))); 
+    dist2 = squareform(pdist(coords(:,2))); 
+    
     ms = MultiStart('Display','iter','FunctionTolerance',1e-6,'PlotFcn',[],...
         'UseParallel',true,'XTolerance',1e-6);
     f = @(x)-sum_metric_loglik(x,dist1,dist2,X,Y,REML,cov_model);
@@ -36,11 +39,11 @@ function [model] = likfit2(x0,dist1,dist2,X,Y,REML,cov_model,Nrun,lower,upper)
         V = sill1 * 1/((2^(nu1-1))*gamma(nu1)) * ((2*sqrt(nu1)*dist1)/rho1).^nu1 .* besselk(nu1,(2*sqrt(nu1)*dist1)/rho1)...
             + sill2 * 1/((2^(nu2-1))*gamma(nu2)) * ((2*sqrt(nu2)*dist2)/rho2).^nu2 .* besselk(nu2,(2*sqrt(nu2)*dist2)/rho2)...
             + sill3 * 1/((2^(nu3-1))*gamma(nu3)) * ((2*sqrt(nu3)*dist3)/rho3).^nu3 .* besselk(nu3,(2*sqrt(nu3)*dist3)/rho3);
-        V(find(dist1==0 & dist2~=0)) = sill1 + sill2 * 1/((2^(nu2-1))*gamma(nu2)) * ((2*sqrt(nu2)*dist2(find(dist1==0 & dist2~=0)))/rho2).^nu2 .* besselk(nu2,(2*sqrt(nu2)*dist2(find(dist1==0 & dist2~=0)))/rho2)...
-            + sill3 * 1/((2^(nu3-1))*gamma(nu3)) * ((2*sqrt(nu3)*dist3(find(dist1==0 & dist2~=0)))/rho3).^nu3 .* besselk(nu3,(2*sqrt(nu3)*dist3(find(dist1==0 & dist2~=0)))/rho3);
-        V(find(dist1~=0 & dist2==0)) = sill1 * 1/((2^(nu1-1))*gamma(nu1)) * ((2*sqrt(nu1)*dist1(find(dist1~=0 & dist2==0)))/rho1).^nu1 .* besselk(nu1,(2*sqrt(nu1)*dist1(find(dist1~=0 & dist2==0)))/rho1)...
-            + sill2 + sill3 * 1/((2^(nu3-1))*gamma(nu3)) * ((2*sqrt(nu3)*dist3(find(dist1~=0 & dist2==0)))/rho3).^nu3 .* besselk(nu3,(2*sqrt(nu3)*dist3(find(dist1~=0 & dist2==0)))/rho3);
-        V(find(dist1==0 & dist2==0)) = sill1 + sill2 + sill3;
+        V(dist1==0 & dist2~=0) = sill1 + sill2 * 1/((2^(nu2-1))*gamma(nu2)) * ((2*sqrt(nu2)*dist2(dist1==0 & dist2~=0))/rho2).^nu2 .* besselk(nu2,(2*sqrt(nu2)*dist2(dist1==0 & dist2~=0))/rho2)...
+            + sill3 * 1/((2^(nu3-1))*gamma(nu3)) * ((2*sqrt(nu3)*dist3(dist1==0 & dist2~=0))/rho3).^nu3 .* besselk(nu3,(2*sqrt(nu3)*dist3(dist1==0 & dist2~=0))/rho3);
+        V(dist1~=0 & dist2==0) = sill1 * 1/((2^(nu1-1))*gamma(nu1)) * ((2*sqrt(nu1)*dist1(dist1~=0 & dist2==0))/rho1).^nu1 .* besselk(nu1,(2*sqrt(nu1)*dist1(dist1~=0 & dist2==0))/rho1)...
+            + sill2 + sill3 * 1/((2^(nu3-1))*gamma(nu3)) * ((2*sqrt(nu3)*dist3(dist1~=0 & dist2==0))/rho3).^nu3 .* besselk(nu3,(2*sqrt(nu3)*dist3(dist1~=0 & dist2==0))/rho3);
+        V(dist1==0 & dist2==0) = sill1 + sill2 + sill3;
     elseif strcmp(cov_model,'exp')
         nugget = x(1);
         sill1 = x(2);
@@ -110,7 +113,8 @@ function [model] = likfit2(x0,dist1,dist2,X,Y,REML,cov_model,Nrun,lower,upper)
     end
       
     model = struct;
-    model.Description = 'Anisotropic model (sum-metric model): ';
+    model.Description = 'Aniso';
+    model.cov_model = cov_model;
     model.Coefficients = Result1;
     model.GeoVal = Result2;
     model.negLoglik = char((strcat({'Negative log-likelihood is '}, num2str(-fval,'%.3f'))));
