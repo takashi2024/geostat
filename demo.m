@@ -7,15 +7,13 @@
 %% Data preparation
 
 % Fixed design matrix (Independent variables)
-X = horzcat(repelem(1,length(data.Yield))', data.D5); % The 1st column is for intecept. The 2nd column is for D1–4. 
+X = horzcat(repelem(1,length(data.Yield))', data.D1); % The 1st column is for intecept. The 2nd column is for D1–4. 
 
 % Response variable
 Y = data.Yield; 
 
-% Distance matrix 
-dist = squareform(pdist([data.x data.y])); % for isotropic model (likfit)
-dist1 = squareform(pdist(data.x)); % for anisotropic model (likfit2)
-dist2 = squareform(pdist(data.y)); % for anisotropic model (likfit2)
+% coordinates
+coords = [data.x data.y];
 
 %% Yield and treatment map
 figure;
@@ -53,19 +51,18 @@ result_ols = fitlm(X(:,2:end), Y);
 %% Fit isotropic model
 rng default % For reproducibility
 x0 = [0.5 0.5 10]; % Initial values for parameters (nugget, sill, and rho).
-Nrun = 20; % Iterations for optimazation
+Nrun = 10; % Iterations for optimazation
 lower = [1e-9 1e-9 1e-9]; % Lower bound list for the parameters
-upper = [1 4 (max(max(dist)))/2];% Upper bound list for the parameters
-[model_1] = likfit(x0,dist,X,Y,1,'exp', Nrun,lower,upper); % Fit model
+upper = [1 4 50];% Upper bound list for the parameters
+[model_1] = likfit(x0,coords,X,Y,1,'exp', Nrun,lower,upper); % Fit model
 
 %% Fit Anisotropic model
 rng default % For reproducibility
 x0 = [0.5 0.5 0.5 0.5 1 1 1 1]; % Initial values for parameters (nugget, sill1, sill2, sill3, rho1, rho2, rho3, and alpha)
-Nrun = 30; % Iterations for optimazation
+Nrun = 10; % Iterations for optimazation
 lower = [1e-9 1e-9 1e-9 1e-9 1e-9 1e-9 1e-9 1e-9]; % Lower bound list for the parameters 
-upper = [1 4 4 4 (max(max(dist1))/2) (max(max(dist2))/2)...
-    (max(max([dist1 dist2]))/2) 1e2];  % Upper bound list for the parameters 
-[model_2] = likfit2(x0,dist1,dist2,X,Y,1,'exp',Nrun,lower,upper); % Fit model
+upper = [1 4 4 4 50 100 50 1e2];  % Upper bound list for the parameters 
+[model_2] = likfit2(x0,coords,X,Y,1,'exp',Nrun,lower,upper); % Fit model
 
 %% Summary: All results (OLS, isotropic and anisotropic models) are shown.
 % OLS model
@@ -91,7 +88,7 @@ end
 
 %% Plot (residual) experimental and fitted variogram (omnidirectional)
 
-[dist_type, variance_1] = variog(model_1,dist,X,Y,30,1);
+[dist_type, variance_1] = variog(model_1,coords,X,Y,30,0);
 
 % Plot experimental variogram
 figure;
@@ -99,7 +96,7 @@ plot(dist_type,variance_1,'.','MarkerSize',12);
 hold on
 
 % Plot fitted variogram
-h = 1:0.1:max(max(dist));
+h = 1:0.1:max(max(dist_type));
 nugget = table2array(model_1.GeoVal(:,1));
 sill = table2array(model_1.GeoVal(:,2));
 rho = table2array(model_1.GeoVal(:,3));
@@ -111,7 +108,7 @@ xlabel('Lag (m)')
 ylabel('Semi-variance (t ha^{-1})^{2}')
 
 %% Plot (residual) experimental and fitted variogram (2 dimentional)
-[dist1_type,dist2_type,variance_2] = variog2(model_2,dist1,dist2,X,Y,100,1);
+[dist1_type,dist2_type,variance_2] = variog2(model_2,coords,X,Y,30,1);
 
 % Plot experimental variogram
 figure;
@@ -122,6 +119,8 @@ ylabel('{\it y} lag (m)')
 zlabel('Semi-variance (t ha^{-1})^{2}')
 
 % Plot fitted variogram
+dist1 = squareform(pdist(coords(:,1)));
+dist2 = squareform(pdist(coords(:,2)));
 dist1_type_raw = unique(dist1);
 dist2_type_raw = unique(dist2);
 dist1_type_list = 0:2.5:round(max(dist1_type_raw));
@@ -158,6 +157,7 @@ fitVariog = nugget + sill1 + sill2 + sill3...
         - (sill1 * exp(-Xlag/rho1)...
         + sill2 * exp(-Ylag/rho2)...
         + sill3 * exp(-sqrt(Xlag.^2 + (alpha*Ylag).^2)/rho3));    
+
     
 figure;
 mesh(xlag,ylag,fitVariog,'FaceLighting','gouraud','LineWidth',0.5)
