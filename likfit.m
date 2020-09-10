@@ -2,7 +2,9 @@
 % (the best parameters with the lowest likelihood) and solutions (optimized
 % parameter for each run).
 
-function [result, solutions] = likfit(x0,dist,X,Y,REML,cov_model,Nrun,lower,upper)
+function [result, solutions] = likfit(x0,coords,X,Y,REML,cov_model,Nrun,lower,upper)
+    dist = squareform(pdist(coords));
+    
     ms = MultiStart('Display','iter','FunctionTolerance',1e-6,'PlotFcn',[],...
         'UseParallel',true,'XTolerance',1e-6);
     f = @(x)-isotropic_loglik(x,dist,X,Y,REML,cov_model);
@@ -24,7 +26,7 @@ function [result, solutions] = likfit(x0,dist,X,Y,REML,cov_model,Nrun,lower,uppe
         rho = x(3);
         nu = x(4);
         V = sill * 1/((2^(nu-1))*gamma(nu)) * ((2*sqrt(nu)*dist)/rho).^nu .* besselk(nu,(2*sqrt(nu)*dist)/rho);
-        V(find(dist==0)) = sill;
+        V(dist==0) = sill;
     elseif strcmp(cov_model,'exp')
         nugget = x(1);
         sill = x(2);
@@ -84,7 +86,8 @@ function [result, solutions] = likfit(x0,dist,X,Y,REML,cov_model,Nrun,lower,uppe
     end
 
     result = struct;
-    result.Description = 'Isotropic model: ';
+    result.Description = 'Iso';
+    result.cov_model = cov_model;
     result.Coefficients = Result1;
     result.GeoVal = Result2;
     result.negLoglik = char((strcat({'Negative log-likelihood is '}, num2str(-fval,'%.3f'))));
