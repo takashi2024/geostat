@@ -1,4 +1,4 @@
-## geostat v0.2.0
+## geostat v0.2.1
 'geostat' aims to analyze on-farm research data. 'geostat' is developed using Matlab 2020a. The effects of treatment (e.g. fertilizer application) or environental variables (soil properties) on crop yield or quality can be evaluated using a spatial linear mixed model. The spatial linear mixed model can account for spatial autocorrelation in a response variable which leads to unreliable inferences. Yield monitor or remotely senesed data are assumed to be used as a response variable.
 
 ## Requirement
