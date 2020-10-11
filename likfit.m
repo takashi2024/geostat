@@ -48,15 +48,16 @@ function [result, solutions] = likfit(x0,coords,X,Y,REML,cov_model,Nrun,lower,up
     [~,p] = size(X);
 
     if (REML==1)
-        new_sill =ssres/(length(Y)-p);
+        sigmasq =ssres/(length(Y)-p);
         estimator = 'REML';
     else
-        new_sill = ssres/length(Y);
+        sigmasq = ssres/length(Y);
         estimator = 'ML';
     end
-
-    new_nugget = nugget * new_sill;
-    new_C = new_sill * C;
+    
+    new_sill = sill * sigmasq; 
+    new_nugget = nugget * sigmasq;
+    new_C = sigmasq * C;
 
     z_score = beta./sqrt(diag(new_C));
     p_value = 2*normcdf(abs(z_score),'upper'); % two-sided test
